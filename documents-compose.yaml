@@ -11,13 +11,12 @@ services:
       - tika
     ports:
       - "8800:8000"
-    env_file:
-      - ./documents/.env
+    env_file: ./documents/.env
     volumes:
       - ./documents/data/paperless/data:/usr/src/paperless/data
       - ./documents/data/paperless/media:/usr/src/paperless/media
-      - "${PAPERLESS_EXPORT_FOLDER:./documents/data/paperless/export}:/usr/src/paperless/export"
-      - "${PAPERLESS_CONSUME_FOLDER:./documents/data/paperless/consume}:/usr/src/paperless/consume"
+      - "${PAPERLESS_EXPORT_PATH:-./documents/data/paperless/export}:/usr/src/paperless/export"
+      - "${PAPERLESS_CONSUME_PATH:-./documents/data/paperless/consume}:/usr/src/paperless/consume"
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
@@ -25,7 +24,7 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:8000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
     networks:
-      - rem-network
+      rem-network:
   
   gotenberg:
     container_name: gotenberg
@@ -38,7 +37,7 @@ services:
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
     networks:
-      - rem-network
+      rem-network:
 
   tika:
     container_name: tika
@@ -47,21 +46,20 @@ services:
     ports:
       - "8998:9998"
     networks:
-      - rem-network
+      rem-network:
 
   db:
     image: docker.io/library/postgres:18
     restart: unless-stopped
     volumes:
       - ./documents/data/db/data:/var/lib/postgresql
-    env_file:
-      - ./documents/.env
+    env_file: ./documents/.env
     environment:
       POSTGRES_DB: ${PAPERLESS_DATABASE:paperless}
       POSTGRES_USER: ${PAPERLESS_DB_USER:paperless}
       POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD:paperless}
     networks:
-      - rem-network
+      rem-network:
 
   broker:
     image: docker.io/library/redis:8
@@ -71,7 +69,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - rem-network
+      rem-network:
 
   paperless-ai:
     container_name: paperless-ai
@@ -81,11 +79,15 @@ services:
       - paperless
     ports:
       - "3100:3000"
-    env_file:
-      - ./documents/.env
+    env_file: ./documents/.env
     volumes:
       - ./documents/data/paperless-ai/data:/app/data
     profiles:
       - ai
     networks:
-      - rem-network
+      rem-network:
+
+networks:
+  rem-network:
+    external: true
+    name: rem-network

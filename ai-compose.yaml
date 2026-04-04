@@ -6,8 +6,7 @@ services:
     image: ollama/ollama:latest
     volumes:
       - ./ai/data/ollama:/root/.ollama
-    env_file:
-      - ./ai/.env
+    env_file: ./ai/.env
     ports:
       - "1134:1134"
     deploy:
@@ -18,7 +17,7 @@ services:
               capabilities: [gpu]
               count: all
     networks:
-      - rem-network
+      rem-network:
 
   open-webui:
     container_name: open-webui
@@ -28,8 +27,7 @@ services:
       - OLLAMA_BASE_URL=http://ollama:11434
       - LOG_LEVEL=info
       - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
-    env_file:
-      - ./ai/.env
+    env_file: ./ai/.env
     volumes:
       - ./ai/data/openwebui/data:/data
       - ./ai/data/openwebui/models:/models
@@ -42,9 +40,14 @@ services:
         max-size: "10m"
         max-file: "3"
     depends_on:
-      - ollama
+      - ollama-gpu
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - rem-network
+      rem-network:
     restart: unless-stopped
+
+networks:
+  rem-network:
+    external: true
+    name: rem-network

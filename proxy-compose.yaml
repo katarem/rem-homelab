@@ -15,19 +15,23 @@ services:
     - ./proxy/nginx/data:/data
     - ./proxy/nginx/letsencrypt:/letsencrypt
   networks:
-    - rem-network
+    rem-network:
   
   duckdns:
     container_name: duckdns
     image: lscr.io/linuxserver/duckdns:latest
     network-mode: host
-    env_file:
-      - ./proxy/.env
+    env_file: ./proxy/.env
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
       - SUBDOMAINS=${DUCKDNS_SUBDOMAINS}
       - TOKEN=${DUCKDNS_TOKEN}
-    networks:
-      - rem-network
+    networks: 
+      rem-network:
+
+networks:
+  rem-network:
+    external: true
+    name: rem-network
