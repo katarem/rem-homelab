@@ -1,0 +1,50 @@
+name: 'rem-ai'
+services:
+
+  ollama-gpu:
+    container_name: ollama-gpu
+    image: ollama/ollama:latest
+    volumes:
+      - ./ai/data/ollama:/root/.ollama
+    env_file:
+      - ./ai/.env
+    ports:
+      - "1134:1134"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all
+    networks:
+      - rem-network
+
+  open-webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - MODEL_DOWNLOAD_DIR=/models
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - LOG_LEVEL=info
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
+    env_file:
+      - ./ai/.env
+    volumes:
+      - ./ai/data/openwebui/data:/data
+      - ./ai/data/openwebui/models:/models
+      - ./ai/data/openwebui/open-webui:/app/backend/data
+    ports:
+      - "8080:8080"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - ollama
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - rem-network
+    restart: unless-stopped

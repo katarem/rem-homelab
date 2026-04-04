@@ -1,0 +1,91 @@
+name: rem-documents
+services:
+  paperless:
+    container_name: paperless
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+      - gotenberg
+      - tika
+    ports:
+      - "8800:8000"
+    env_file:
+      - ./documents/.env
+    volumes:
+      - ./documents/data/paperless/data:/usr/src/paperless/data
+      - ./documents/data/paperless/media:/usr/src/paperless/media
+      - "${PAPERLESS_EXPORT_FOLDER:./documents/data/paperless/export}:/usr/src/paperless/export"
+      - "${PAPERLESS_CONSUME_FOLDER:./documents/data/paperless/consume}:/usr/src/paperless/consume"
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:8000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+    networks:
+      - rem-network
+  
+  gotenberg:
+    container_name: gotenberg
+    image: docker.io/gotenberg/gotenberg:8.25
+    restart: unless-stopped
+    ports:
+      - "8300"
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+    networks:
+      - rem-network
+
+  tika:
+    container_name: tika
+    image: docker.io/apache/tika:latest
+    restart: unless-stopped
+    ports:
+      - "8998:9998"
+    networks:
+      - rem-network
+
+  db:
+    image: docker.io/library/postgres:18
+    restart: unless-stopped
+    volumes:
+      - ./documents/data/db/data:/var/lib/postgresql
+    env_file:
+      - ./documents/.env
+    environment:
+      POSTGRES_DB: ${PAPERLESS_DATABASE:paperless}
+      POSTGRES_USER: ${PAPERLESS_DB_USER:paperless}
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD:paperless}
+    networks:
+      - rem-network
+
+  broker:
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    volumes:
+      - "./documents/data/broker/data:/data"
+    ports:
+      - "6379:6379"
+    networks:
+      - rem-network
+
+  paperless-ai:
+    container_name: paperless-ai
+    image: clusterzx/paperless-ai:latest
+    restart: unless-stopped
+    depends_on:
+      - paperless
+    ports:
+      - "3100:3000"
+    env_file:
+      - ./documents/.env
+    volumes:
+      - ./documents/data/paperless-ai/data:/app/data
+    profiles:
+      - ai
+    networks:
+      - rem-network

@@ -1,0 +1,33 @@
+name: rem-proxy
+services:
+
+  nginx-proxy-manager:
+    container_name: nginx-proxy-manager
+    image: jc21/nginx-proxy-manger:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+  environment:
+    TZ: "Etc/UTC"
+  volumes:
+    - ./proxy/nginx/data:/data
+    - ./proxy/nginx/letsencrypt:/letsencrypt
+  networks:
+    - rem-network
+  
+  duckdns:
+    container_name: duckdns
+    image: lscr.io/linuxserver/duckdns:latest
+    network-mode: host
+    env_file:
+      - ./proxy/.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SUBDOMAINS=${DUCKDNS_SUBDOMAINS}
+      - TOKEN=${DUCKDNS_TOKEN}
+    networks:
+      - rem-network

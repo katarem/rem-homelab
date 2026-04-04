@@ -1,0 +1,156 @@
+name: rem-media
+services:
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin
+    container_name: jellyfin
+    env_file: ./media/.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./media/data/jellyfin/config:/config
+      - "${MEDIA_SERIES_PATH}:/data/series"
+      - "${MEDIA_MOVIES_PATH}:/data/movies"
+      - "${MEDIA_ANIME_PATH}:/data/anime"
+    ports:
+      - 8096:8096
+      - 8920:8920
+    restart: unless-stopped
+  #  deploy:
+  #    resources:
+  #     reservations:
+  #       devices:
+  #         - driver: nvidia
+  #           count: 1
+  #           capabilities: [gpu]
+    networks:
+      rem-network:
+
+  sonarr:
+    container_name: sonarr
+    image: lscr.io/linuxserver/sonarr:latest
+    env_file: ./media/.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./media/data/sonarr/config:/config
+      - "${MEDIA_SERIES_PATH}:/series"
+      - "${MEDIA_ANIME_PATH}:/anime"
+      - "${MEDIA_DOWNLOADS_PATH}:/downloads"
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    networks:
+      rem-network:
+
+  radarr:
+    container_name: radarr
+    image: lscr.io/linuxserver/radarr:latest
+    env_file: ./media/.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./media/data/radarr/config:/config
+      - "${MEDIA_MOVIES_PATH}:/movies"
+      - "${MEDIA_DOWNLOADS_PATH}:/downloads"
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    networks:
+      rem-network:
+
+  seerr:
+    container_name: seerr
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    environment:
+      - LOG_LEVEL=info
+      - TZ=Etc/UTC
+      - PORT=5055
+    ports:
+      - 5055:5055
+    volumes:
+      - ./media/data/seerr/config:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      rem-network:
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent:latest
+    env_file: ./media/.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=53565
+    volumes:
+      - ./media/data/qbittorrent/config:/config
+      - "${MEDIA_DOWNLOADS_PATH}:/downloads"
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+    networks:
+      rem-network:
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./media/data/prowlarr/config:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    networks:
+      rem-network:
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    env_file: ./media/.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - AUTO_UPDATE=true
+      - RUN_OPTS=
+    volumes:
+      - ./media/data/jackett/config:/config
+      - "${MEDIA_DOWNLOADS_PATH}:/downloads"
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+    
+  byparr:
+    container_name: byparr
+    image: ghcr.io/thephaseless/byparr:latest
+    restart: unless-stopped
+    init: true
+    networks:
+      rem-network:
+    profiles:
+      - bypass
+networks:
+  rem-network:
+    external: true
+    name: rem-network
