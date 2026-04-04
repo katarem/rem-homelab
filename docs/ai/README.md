@@ -28,6 +28,6 @@ Archivo: `ai/.env` (base: `ai/.env.example`)
 ## Comandos
 
 ```bash
-docker compose -f ai-compose.yaml up -d
+docker compose --env-file ai/.env -f ai-compose.yaml up -d
 docker compose -f ai-compose.yaml down
 ```

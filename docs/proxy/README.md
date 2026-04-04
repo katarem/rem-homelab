@@ -26,6 +26,6 @@ Archivo: `proxy/.env` (base: `proxy/.env.example`)
 ## Comandos
 
 ```bash
-docker compose -f proxy-compose.yaml up -d
+docker compose --env-file proxy/.env -f proxy-compose.yaml up -d
 docker compose -f proxy-compose.yaml down
 ```

@@ -26,7 +26,7 @@ docker network create rem-network
 Ejemplo:
 
 ```bash
-docker compose -f media-compose.yaml up -d
+docker compose --env-file media/.env -f media-compose.yaml up -d
 ```
 
 Parar:

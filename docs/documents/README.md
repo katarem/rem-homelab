@@ -37,7 +37,7 @@ Archivo: `documents/.env` (base: `documents/.env.example`)
 ## Comandos
 
 ```bash
-docker compose -f docs-compose.yaml up -d
-docker compose -f docs-compose.yaml --profile ai up -d
+docker compose --env-file documents/.env -f docs-compose.yaml up -d
+docker compose --env-file documents/.env -f docs-compose.yaml --profile ai up -d
 docker compose -f docs-compose.yaml down
 ```

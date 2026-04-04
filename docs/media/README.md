@@ -37,7 +37,7 @@ Archivo: `media/.env` (base: `media/.env.example`)
 ## Comandos
 
 ```bash
-docker compose -f media-compose.yaml up -d
-docker compose -f media-compose.yaml --profile bypass up -d
+docker compose --env-file media/.env -f media-compose.yaml up -d
+docker compose --env-file media/.env -f media-compose.yaml --profile bypass up -d
 docker compose -f media-compose.yaml down
 ```

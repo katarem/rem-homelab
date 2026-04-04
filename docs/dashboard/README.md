@@ -25,6 +25,6 @@ Archivo: `dashboard/.env` (base: `dashboard/.env.example`)
 ## Comandos
 
 ```bash
-docker compose -f dashboard-compose.yaml up -d
+docker compose --env-file dashboard/.env -f dashboard-compose.yaml up -d
 docker compose -f dashboard-compose.yaml down
 ```
