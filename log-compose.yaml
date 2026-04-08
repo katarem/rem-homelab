@@ -1,0 +1,33 @@
+services:
+  kuma:
+    image: louislam/uptime-kuma:2
+    container_name: kuma
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./logging/data/kuma/data:/app/data
+      - //var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=UTC
+      - UMASK=0022
+    networks:
+      rem-network:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+  
+volumes:
+  kuma-db:
+
+networks:
+  rem-network:
+    external: true
+    name: rem-network

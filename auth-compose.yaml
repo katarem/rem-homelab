@@ -1,0 +1,105 @@
+services:
+
+  authentik-db:
+    continer_name: authentik-db
+    env_file: ./auth/.env
+    environment:
+      POSTGRES_DB: ${AUTHENTIK_DATABASE:-authentik}
+      POSTGRES_PASSWORD: ${AUTHENTIK_DATABASE_PASSWORD:?database password required}
+      POSTGRES_USER: ${AUTHENTIK_DATABASE_USER:-authentik}
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+      - CMD-SHELL
+      - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 5s
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - ./auth/data/authentik-database:/var/lib/postgresql/data
+
+  authentik-redis:
+    continer_name: authentik-redis
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 30s
+    volumes:
+      - ./auth/data/authentik-redis:/data
+
+  authentik-server:
+    container_name: authentik-server
+    command: server
+    depends_on:
+      authentik-db:
+        condition: service_healthy
+    env_file: ./auth/.env
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_DATABASE:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DATABASE_PASSWORD}
+      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_DATABASE_USER:-authentik}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ghcr.io/goauthentik/server:2026.2.1
+    ports:
+    - "9900:9000"
+    - "9943:9443"
+    restart: unless-stopped
+    shm_size: 512mb
+    networks:
+      rem-network:
+    volumes:
+      - ./auth/data/authentik-server/media:/media
+      - ./auth/data/authentik-server/data:/data
+      - ./auth/data/authentik-server/custom-templates:/templates
+
+  authentik-worker:
+    container_name: authentik-worker
+    command: worker
+    depends_on:
+      authentik-db:
+        condition: service_healthy
+    env_file: ./auth/.env
+    networks:
+      rem-network:
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_DATABASE:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DATABASE_PASSWORD}
+      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_DATABASE_USER:-authentik}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ghcr.io/goauthentik/server:2026.2.1
+    restart: unless-stopped
+    shm_size: 512mb
+    user: root
+    volumes:
+    - //var/run/docker.sock:/var/run/docker.sock
+    - ./auth/data/authentik-worker/data:/data
+    - ./auth/data/authentik-worker/certs:/certs
+    - ./auth/data/authentik-worker/custom-templates:/templates
+
+  authentik-ldap:
+    container_name: authentik-ldap
+    image: ghcr.io/goauthentik/proxy
+    env_file: ./auth/.env
+    networks:
+      rem-network:
+    ports:
+        - 9300:9000
+        - 9343:9443
+    environment:
+        AUTHENTIK_HOST: https://auth.katarem.duckdns.org
+        AUTHENTIK_INSECURE: "true"
+        AUTHENTIK_TOKEN: ${AUTHENTIK_LDAP_TOKEN}
+
+networks:
+  rem-network:
+    external: true
+    name: rem-network
