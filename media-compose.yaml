@@ -6,12 +6,13 @@ services:
     container_name: jellyfin
     env_file: ./media/.env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - NVIDIA_VISIBLE_DEVICES=all
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: video,compute,utility
     volumes:
-      - ./media/data/jellyfin/config:/config
+      - "${JELLYFIN_CONFIG_PATH:-./media/data/jellyfin/config}:/config"
       - "${MEDIA_SERIES_PATH}:/data/series"
       - "${MEDIA_MOVIES_PATH}:/data/movies"
       - "${MEDIA_ANIME_PATH}:/data/anime"
@@ -19,13 +20,7 @@ services:
       - 8096:8096
       - 8920:8920
     restart: unless-stopped
-  #  deploy:
-  #    resources:
-  #     reservations:
-  #       devices:
-  #         - driver: nvidia
-  #           count: 1
-  #           capabilities: [gpu]
+    runtime: nvidia
     networks:
       rem-network:
 
@@ -34,11 +29,11 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     env_file: ./media/.env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
     volumes:
-      - ./media/data/sonarr/config:/config
+      - "${SONARR_CONFIG_PATH:-./media/data/sonarr/config}:/config"
       - "${MEDIA_SERIES_PATH}:/series"
       - "${MEDIA_ANIME_PATH}:/anime"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
@@ -53,11 +48,11 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     env_file: ./media/.env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
     volumes:
-      - ./media/data/radarr/config:/config
+      - "${RADARR_CONFIG_PATH:-./media/data/radarr/config}:/config"
       - "${MEDIA_MOVIES_PATH}:/movies"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
     ports:
@@ -71,13 +66,13 @@ services:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
     environment:
-      - LOG_LEVEL=info
-      - TZ=Etc/UTC
-      - PORT=5055
+      LOG_LEVEL: info
+      TZ: Etc/UTC
+      PORT: 5055
     ports:
       - 5055:5055
     volumes:
-      - ./media/data/seerr/config:/app/config
+      - "${SEERR_CONFIG_PATH:-./media/data/seerr/config}:/app/config"
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -93,18 +88,18 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     env_file: ./media/.env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - WEBUI_PORT=8080
-      - TORRENTING_PORT=53565
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
+      WEBUI_PORT: 8080
+      TORRENTING_PORT: 53565
     volumes:
-      - ./media/data/qbittorrent/config:/config
+      - "${TORRENT_CONFIG_PATH:-./media/data/qbittorrent/config}:/config"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
     ports:
       - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
+      - 53565:53565
+      - 53565:53565/udp
     restart: unless-stopped
     networks:
       rem-network:
@@ -113,11 +108,11 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
     volumes:
-      - ./media/data/prowlarr/config:/config
+      - "${PROWLARR_CONFIG_PATH:-./media/data/prowlarr/config}:/config"
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -129,18 +124,20 @@ services:
     container_name: jackett
     env_file: ./media/.env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - AUTO_UPDATE=true
-      - RUN_OPTS=
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
+      AUTO_UPDATE: true
+      RUN_OPTS: 
     volumes:
-      - ./media/data/jackett/config:/config
+      - "${JACKETT_CONFIG_PATH:-./media/data/jackett/config}:/config"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
     ports:
       - 9117:9117
     restart: unless-stopped
-    
+    networks:
+      rem-network:
+
   byparr:
     container_name: byparr
     image: ghcr.io/thephaseless/byparr:latest
