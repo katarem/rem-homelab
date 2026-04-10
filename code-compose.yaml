@@ -1,18 +1,24 @@
+name: rem-code
 services:
 
   gitea:
     image: docker.gitea.com/gitea:1.25.5
     container_name: gitea
     environment:
-      - USER_UID=1000
-      - USER_GID=1000
+      USER_UID: 1000
+      USER_GID: 1000
+      GITEA__database__DB_TYPE: postgres
+      GITEA__database__HOST: gitea-db:5432
+      GITEA__database__NAME: ${GITEA_DATABASE:-gitea}
+      GITEA__database__USER: ${GITEA_DATABASE_USER:-gitea}
+      GITEA__database__PASSWD: ${GITEA_DATABASE_PASSWORD:-gitea}
     restart: always
     networks:
       rem-network:
     volumes:
-      - ./code/data/gitea/data:/data
-      - ./code/data/gitea/etc/timezone:/etc/timezone:ro
-      - ./code/data/gitea/etc/localtime:/etc/localtime:ro
+      - "${GITEA_DATA_PATH:-./code/data/gitea/data}:/data"
+      - "${GITEA_TZ_PATH:-./code/data/gitea/etc/timezone}:/etc/timezone:ro"
+      - "${GITEA_LT_PATH:-./code/data/gitea/etc/localtime}:/etc/localtime:ro"
     ports:
       - "3333:3000"
       - "222:22"
@@ -21,13 +27,15 @@ services:
     image: docker.io/library/postgres:14
     restart: always
     environment:
-      - POSTGRES_USER=${GITEA_DATABASE_USER:-gitea}
-      - POSTGRES_PASSWORD=${GITEA_DATABASE_PASSWORD:-gitea}
-      - POSTGRES_DB=${GITEA_DATABASE:-gitea}
+      USER_UID: 1000
+      USER_GID: 1000
+      POSTGRES_USER: ${GITEA_DATABASE_USER:-gitea}
+      POSTGRES_PASSWORD: ${GITEA_DATABASE_PASSWORD:-gitea}
+      POSTGRES_DB: ${GITEA_DATABASE:-gitea}
     networks:
       rem-network:
     volumes:
-      - ./code/data/gitea/database/:/var/lib/postgresql/data
+      - "${GITEA_DATABASE_PATH:-./code/data/gitea/database}:/var/lib/postgresql/data"
 
   sonarqube:
     image: sonarqube:community
@@ -35,14 +43,16 @@ services:
     read_only: true
     env_file: ./code/.env
     environment:
+      USER_UID: 1000
+      USER_GID: 1000
       SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/${SONARQUBE_DATABASE:-sonar}
       SONAR_JDBC_USERNAME: ${SONARQUBE_DATABASE_USER:-sonar}
       SONAR_JDBC_PASSWORD: ${SONARQUBE_DATABASE_PASSWORD:-sonar}
     volumes:
-      - ./code/data/sonarqube/data:/opt/sonarqube/data
-      - ./code/data/sonarqube/extensions:/opt/sonarqube/extensions
-      - ./code/data/sonarqube/logs:/opt/sonarqube/logs
-      - ./code/data/sonarqube/temp:/opt/sonarqube/temp
+      - "${SONAR_DATA_PATH:-./code/data/sonarqube/data}:/opt/sonarqube/data"
+      - "${SONAR_EXTENSIONS_PATH:-./code/data/sonarqube/extensions}:/opt/sonarqube/extensions"
+      - "${SONAR_LOGS_PATH:-./code/data/sonarqube/logs}:/opt/sonarqube/logs"
+      - "${SONAR_TMP_PATH:-./code/data/sonarqube/temp}:/opt/sonarqube/temp"
     tmpfs:
       - /tmp:size=256M,mode=1777
     ports:
@@ -55,13 +65,15 @@ services:
     restart: always
     env_file: ./code/.env
     environment:
-      - POSTGRES_USER=${SONARQUBE_DATABASE_USER:-sonar}
-      - POSTGRES_PASSWORD=${SONARQUBE_DATABASE_PASSWORD:-sonar}
-      - POSTGRES_DB=${SONARQUBE_DATABASE:-sonar}
+      USER_UID: 1000
+      USER_GID: 1000
+      POSTGRES_USER: ${SONARQUBE_DATABASE_USER:-sonar}
+      POSTGRES_PASSWORD: ${SONARQUBE_DATABASE_PASSWORD:-sonar}
+      POSTGRES_DB: ${SONARQUBE_DATABASE:-sonar}
     networks:
       rem-network:
     volumes:
-      - ./code/data/sonarqube/database/:/var/lib/postgresql/data
+      - "${SONAR_DATABASE_PATH:-./code/data/sonarqube/database}:/var/lib/postgresql/data"
 
 networks:
   rem-network:
