@@ -83,6 +83,40 @@ services:
     networks:
       rem-network:
 
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
+    volumes:
+      - ${BAZARR_CONFIG_PATH:-./media/data/bazarr/config}:/config
+      - ${MEDIA_MOVIES_PATH}:/movies 
+      - ${MEDIA_SERIES_PATH}:/series
+      - ${MEDIA_ANIME_PATH}:/anime
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    networks:
+      rem-network:
+    
+  configarr:
+    image: ghcr.io/raydak-labs/configarr:latest
+    container_name: configarr
+    env_file: ./media/.env
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      TZ: Etc/UTC
+    volumes:
+      - "${CONFIGARR_CONFIG_PATH:-./media/data/configarr/config}:/app/config" # Contains the config.yml and secrets.yml
+      - "${CONFIGARR_REPOS_PATH:-./media/data/configarr/dockerrepos}:/app/repos" # Cache repositories
+      - "${CONFIGARR_CUSTOM_CFS_PATH:-./media/data/configarr/custom/cfs}:/app/cfs" # Optional if custom formats locally provided
+      - "${CONFIGARR_CUSTOM_TEMPLATES:-./media/data/configarr/custom/templates}:/app/templates" # Optional if custom templates
+    networks:
+      rem-network:
+
   qbittorrent:
     container_name: qbittorrent
     image: lscr.io/linuxserver/qbittorrent:latest

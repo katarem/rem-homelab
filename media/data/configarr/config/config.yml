@@ -1,0 +1,108 @@
+telemetry: false
+customFormatDefinitions:
+  - trash_id: custom-anime-spanish-subs
+    trash_scores:
+      default: 150
+    trash_description: "Anime release title indicates Spanish subtitles"
+    name: "Anime Spanish Subs"
+    includeCustomFormatWhenRenaming: false
+    specifications:
+      - name: "Explicit Spanish subtitle tags"
+        implementation: ReleaseTitleSpecification
+        negate: false
+        required: true
+        fields:
+          value: >-
+            (?i)\b(?:
+              (?:sub(?:s|bed|titles?)|subtit(?:les|ulos?))
+              [ ._-]?
+              (?:es|esp|spa|spanish|español|castellano|latam|latino)
+              |
+              (?:es|esp|spa|spanish|español|castellano|latam|latino)
+              [ ._-]?
+              (?:sub(?:s|bed|titles?)|subtit(?:les|ulos?))
+            )\b
+
+  - trash_id: custom-anime-multi-subs
+    trash_scores:
+      default: 50
+    trash_description: "Anime release title indicates multi subtitles"
+    name: "Anime Multi Subs"
+    includeCustomFormatWhenRenaming: false
+    specifications:
+      - name: "Multi subtitle tags"
+        implementation: ReleaseTitleSpecification
+        negate: false
+        required: true
+        fields:
+          value: >-
+            (?i)\b(?:multi(?:[ ._-]?(?:sub(?:s|bed|titles?)|subtit(?:les|ulos?)))?|multi)\b
+
+sonarr:
+  anime:
+    base_url: http://sonarr:8989
+    api_key: !secret SONARR_API_KEY
+    quality_definition:
+      type: anime
+    include:
+      - template: sonarr-quality-definition-anime
+      - template: sonarr-v4-quality-profile-anime
+      - template: sonarr-v4-custom-formats-anime
+    custom_formats:
+      - trash_ids:
+        - custom-anime-spanish-subs
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 150
+      - trash_ids:
+        - custom-anime-multi-subs
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 50
+  main:
+    base_url: http://sonarr:8989
+    api_key: !secret SONARR_API_KEY
+    quality_definition:
+      type: series
+    include:
+      - template: sonarr-v4-quality-profile-web-1080p
+      - template: sonarr-v4-custom-formats-web-1080p
+      - template: sonarr-v4-quality-profile-web-2160p
+      - template: sonarr-v4-custom-formats-web-2160p
+
+radarr:
+  anime:
+      base_url: http://radarr:7878
+      api_key: !secret RADARR_API_KEY
+      quality_definition:
+        type: anime
+      include:
+        - template: radarr-quality-definition-anime
+        - template: radarr-quality-profile-anime
+        - template: radarr-custom-formats-anime
+      custom_formats:
+        - trash_ids:
+            - custom-anime-spanish-subs
+          assign_scores_to:
+            - name: Remux-1080p - Anime
+              score: 150
+        - trash_ids:
+            - custom-anime-multi-subs
+          assign_scores_to:
+            - name: Remux-1080p - Anime
+              score: 50
+  main:
+    base_url: http://radarr:7878
+    api_key: !secret RADARR_API_KEY
+    quality_definition:
+      type: movie
+    include:
+      - template: radarr-quality-definition-movie
+      - template: radarr-quality-profile-hd-bluray-web
+      - template: radarr-custom-formats-hd-bluray-web
+      - template: radarr-quality-profile-uhd-bluray-web
+      - template: radarr-custom-formats-uhd-bluray-web
+      - template: radarr-quality-profile-remux-web-1080p
+      - template: radarr-custom-formats-remux-web-1080p
+      - template: radarr-quality-profile-remux-web-2160p
+      - template: radarr-custom-formats-remux-web-2160p
