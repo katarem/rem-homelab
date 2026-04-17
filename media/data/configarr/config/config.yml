@@ -37,6 +37,35 @@ customFormatDefinitions:
         fields:
           value: >-
             (?i)\b(?:multi(?:[ ._-]?(?:sub(?:s|bed|titles?)|subtit(?:les|ulos?)))?|multi)\b
+  - trash_id: custom-spanish-audio
+    trash_scores:
+      default: 200
+    trash_description: "Release contains Spanish audio"
+    name: "Spanish Audio"
+    includeCustomFormatWhenRenaming: false
+    specifications:
+      - name: "Spanish audio in title"
+        implementation: ReleaseTitleSpecification
+        negate: false
+        required: true
+        fields:
+          value: >-
+            (?i)\b(?:esp|spa|spanish|español|castellano|lat(?:am|ino)?)\b
+
+  - trash_id: custom-dual-audio
+    trash_scores:
+      default: 100
+    trash_description: "Dual or multi audio release"
+    name: "Dual Audio / Multi"
+    includeCustomFormatWhenRenaming: false
+    specifications:
+      - name: "Dual or multi audio"
+        implementation: ReleaseTitleSpecification
+        negate: false
+        required: true
+        fields:
+          value: >-
+            (?i)\b(?:dual(?:[ ._-]?audio)?|multi(?:[ ._-]?audio)?)\b
 
 sonarr:
   anime:
@@ -69,28 +98,49 @@ sonarr:
       - template: sonarr-v4-custom-formats-web-1080p
       - template: sonarr-v4-quality-profile-web-2160p
       - template: sonarr-v4-custom-formats-web-2160p
+    custom_formats:
+      - trash_ids:
+          - custom-spanish-audio
+        assign_scores_to:
+          - name: WEB-1080p - ES
+            score: 200
+      - trash_ids:
+          - custom-dual-audio
+        assign_scores_to:
+          - name: WEB-1080p - ES
+            score: 80
+      - trash_ids:
+          - custom-spanish-audio
+        assign_scores_to:
+          - name: WEB-2160p - ES
+            score: 200
+      - trash_ids:
+          - custom-dual-audio
+        assign_scores_to:
+          - name: WEB-2160p - ES
+            score: 80
 
 radarr:
   anime:
-      base_url: http://radarr:7878
-      api_key: !secret RADARR_API_KEY
-      quality_definition:
-        type: anime
-      include:
-        - template: radarr-quality-definition-anime
-        - template: radarr-quality-profile-anime
-        - template: radarr-custom-formats-anime
-      custom_formats:
-        - trash_ids:
-            - custom-anime-spanish-subs
-          assign_scores_to:
-            - name: Remux-1080p - Anime
-              score: 150
-        - trash_ids:
-            - custom-anime-multi-subs
-          assign_scores_to:
-            - name: Remux-1080p - Anime
-              score: 50
+    base_url: http://radarr:7878
+    api_key: !secret RADARR_API_KEY
+    quality_definition:
+      type: anime
+    include:
+      - template: radarr-quality-definition-anime
+      - template: radarr-quality-profile-anime
+      - template: radarr-custom-formats-anime
+    custom_formats:
+      - trash_ids:
+          - custom-anime-spanish-subs
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 150
+      - trash_ids:
+          - custom-anime-multi-subs
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 50
   main:
     base_url: http://radarr:7878
     api_key: !secret RADARR_API_KEY
@@ -106,3 +156,44 @@ radarr:
       - template: radarr-custom-formats-remux-web-1080p
       - template: radarr-quality-profile-remux-web-2160p
       - template: radarr-custom-formats-remux-web-2160p
+    custom_formats:
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: HD Bluray + WEB - ES
+              score: 200
+        - trash_ids:
+            - custom-dual-audio
+          assign_scores_to:
+            - name: HD Bluray + WEB - ES
+              score: 80
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: Remux + WEB 1080p - ES
+              score: 200
+        - trash_ids:
+            - custom-dual-audio
+          assign_scores_to:
+            - name: Remux + WEB 1080p - ES
+              score: 80
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: Remux + WEB 2160p - ES
+              score: 200
+        - trash_ids:
+            - custom-dual-audio
+          assign_scores_to:
+            - name: Remux + WEB 2160p - ES
+              score: 80
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: UHD Bluray + WEB - ES
+              score: 200
+        - trash_ids:
+            - custom-dual-audio
+          assign_scores_to:
+            - name: UHD Bluray + WEB - ES
+              score: 80

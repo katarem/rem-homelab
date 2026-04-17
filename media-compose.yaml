@@ -114,6 +114,8 @@ services:
       - "${CONFIGARR_REPOS_PATH:-./media/data/configarr/dockerrepos}:/app/repos" # Cache repositories
       - "${CONFIGARR_CUSTOM_CFS_PATH:-./media/data/configarr/custom/cfs}:/app/cfs" # Optional if custom formats locally provided
       - "${CONFIGARR_CUSTOM_TEMPLATES:-./media/data/configarr/custom/templates}:/app/templates" # Optional if custom templates
+    profiles:
+      - config
     networks:
       rem-network:
 
@@ -181,6 +183,106 @@ services:
       rem-network:
     profiles:
       - bypass
+
+  maintainerr:
+    image: ghcr.io/maintainerr/maintainerr:latest
+    user: 1000:1000
+    volumes:
+      - "${MEDIA_ANIME_PATH}:/anime"
+      - "${MEDIA_SERIES_PATH}:/series"
+      - "${MEDIA_MOVIES_PATH}:/movies"
+    environment:
+      TZ: Etc/UTC
+    ports:
+      - 6246:6246
+    restart: unless-stopped
+    networks:
+      rem-network:
+
+  subgenai:
+    image: 'mccloud/subgen:latest'
+    container_name: subgenai
+    volumes:
+      - "${SUBGEN_MODEL_PATH:-./media/data/subgen/models}/models:/subgen/models"
+      - "${SUBGEN_ENV_PATH:-./media/subgen.env}:/subgen/subgen.env:ro"
+    environment:
+      LOG_LEVEL: debug
+      NAME_SERVERS: 9.9.9.9
+      PROCADDEDMEDIA: true
+      PROCMEDIAONPLAY: false
+      JELLYFINTOKEN: ${SUBGEN_TOKEN:?Token is required}
+      JELLYFINSERVER: 'http://jellyfin:8096'
+      CONCURRENT_TRANSCRIPTIONS: 2
+      USE_PATH_MAPPING: false
+      MODEL_PATH: ./models
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: video,compute,utility
+    runtime: nvidia
+    networks:
+      rem-network:
+
+  lingarr:
+    image: ghcr.io/lingarr-translate/lingarr:latest # or lingarr/lingarr:latest
+    container_name: lingarr
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_URLS: http://+:9876
+      DB_CONNECTION: mysql
+      DB_HOST: lingarr-db
+      DB_PORT: 3306
+      DB_DATABASE: ${LINGARR_DATABASE:-lingarr}
+      DB_USERNAME: ${LINGARR_DATABASE_USER:-lingarr}
+      DB_PASSWORD: ${LINGARR_DATABASE_PASSWORD:-lingarr}
+    ports:
+      - "9876:9876"
+    volumes:
+      - "${MEDIA_ANIME_PATH}:/anime"
+      - "${MEDIA_SERIES_PATH}:/series"
+      - "${MEDIA_MOVIES_PATH}:/movies"
+      - "${LINGARR_CONFIG_PATH:-./media/data/lingarr/config}:/app/config"
+    networks:
+      rem-network:
+    depends_on:
+      lingarr-db:
+        condition: service_healthy
+
+  lingarr-db:
+    image: mariadb:latest
+    container_name: lingarr-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${LINGARR_DATABASE:-lingarr}
+      MYSQL_USER: ${LINGARR_DATABASE_USER:-lingarr}
+      MYSQL_PASSWORD: ${LINGARR_DATABASE_PASSWORD:-lingarr}
+      MYSQL_ROOT_PASSWORD: ${LINGARR_DATABASE_ROOT_PASSWORD:-lingarr} 
+    volumes:
+      - ${LINGARR_DATABASE_PATH:-./media/data/lingarr-database/data}:/var/lib/mysql
+    networks:
+      rem-network:
+    healthcheck:
+      test: "mariadb $$MYSQL_DATABASE -u$$MYSQL_USER -p$$MYSQL_PASSWORD -e 'SELECT 1;'"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
+    restart: unless-stopped
+    ports:
+      - "11011:11011"
+    volumes:
+      - "${CLEANUPARR_CONFIG_PATH:-./media/data/cleanuparr/config}:/config"
+    environment:
+      - PORT=11011
+      - BASE_PATH=
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      - TZ=Etc/UTC
+    networks:
+      rem-network:
+
 networks:
   rem-network:
     external: true
