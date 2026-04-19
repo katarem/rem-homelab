@@ -1,0 +1,48 @@
+name: rem-task
+services:
+  vikunja:
+    container_name: vikunja
+    image: vikunja/vikunja
+    env_file: ./task/.env
+    environment:
+      VIKUNJA_SERVICE_PUBLICURL: ${VIKUNJA_PUBLIC_URL}
+      VIKUNJA_DATABASE_HOST: vikunja-db
+      VIKUNJA_DATABASE_PASSWORD: ${VIKUNJA_DATABASE_PASSWORD:-vikunja}
+      VIKUNJA_DATABASE_TYPE: postgres
+      VIKUNJA_DATABASE_USER: ${VIKUNJA_DATABASE_USER:-vikunja}
+      VIKUNJA_DATABASE_DATABASE: ${VIKUNJA_DATABASE:-vikunja}
+      VIKUNJA_SERVICE_JWTSECRET: ${VIKUNJA_SECRET:?Secret is required} # use openssl
+      VIKUNJA_DATABASE_SSLMODE: disable
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: 0
+    ports:
+      - 3456:3456
+    volumes:
+      - ${VIKUNJA_DATA_PATH:-./task/data/vikunja/data}:/app/vikunja/files
+    depends_on:
+      vikunja-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      rem-network:
+
+  vikunja-db:
+    container_name: vikunja-db
+    image: paradedb/paradedb:latest
+    env_file: ./task/.env
+    environment:
+      POSTGRES_PASSWORD: ${VIKUNJA_DATABASE_PASSWORD:-vikunja}
+      POSTGRES_USER: ${VIKUNJA_DATABASE_USER:-vikunja}
+      POSTGRES_DATABASE: ${VIKUNJA_DATABASE:-vikunja}
+    volumes:
+      - "${VIKUNJA_DATABASE_DATA_PATH:-./task/data/vikunja-db/data}:/var/lib/postgresql"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER"]
+      interval: 2s
+      start_period: 30s
+    networks:
+      rem-network:
+
+networks:
+  rem-network:
+    external: true
