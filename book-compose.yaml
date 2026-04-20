@@ -1,0 +1,58 @@
+name: rem-book
+
+x-suwayomi-env: &swayomi-env
+  TZ: Etc/UTC
+  FLARESOLVERR_ENABLED: "true"
+  FLARESOLVERR_URL: http://byparr:8191
+  DOWNLOAD_AS_CBZ: "true"
+  AUTH_MODE: basic_auth
+  EXTENSION_REPOS: '["https://github.com/keiyoushi/extensions"]'
+
+x-suwayomi: &swayomi-base
+    image: ghcr.io/suwayomi/suwayomi-server:preview
+    user: 1000:1000
+    environment:
+      <<: *swayomi-env
+    env_file: ./book/.env
+    restart: on-failure:3
+    networks:
+      rem-network:
+
+services:
+  manga1:
+    <<: *swayomi-base
+    volumes:
+      - "${MANGA1_DATA_PATH:-./book/data/manga1/data}:/home/suwayomi/.local/share/Tachidesk"
+      - "${MANGA1_MANGA_PATH}:/home/suwayomi/.local/share/Tachidesk/local"
+    environment:
+      <<: *swayomi-env
+      BASIC_AUTH_USERNAME: ${MANGA1_USER}
+      BASIC_AUTH_PASSWORD: ${MANGA1_PASSWORD}
+    ports:
+      - "4567:4567"
+  manga2:
+    <<: *swayomi-base
+    volumes:
+      - "${MANGA2_DATA_PATH:-./book/data/manga2/data}:/home/suwayomi/.local/share/Tachidesk"
+      - "${MANGA2_MANGA_PATH}:/home/suwayomi/.local/share/Tachidesk/local"
+    environment:
+      <<: *swayomi-env
+      BASIC_AUTH_USERNAME: ${MANGA2_USER}
+      BASIC_AUTH_PASSWORD: ${MANGA2_PASSWORD}
+    ports:
+      - "4568:4567"
+  manga3:
+    <<: *swayomi-base
+    volumes:
+      - "${MANGA3_DATA_PATH:-./book/data/manga3/data}:/home/suwayomi/.local/share/Tachidesk"
+      - "${MANGA3_MANGA_PATH}:/home/suwayomi/.local/share/Tachidesk/local"
+    environment:
+      <<: *swayomi-env
+      BASIC_AUTH_USERNAME: ${MANGA3_USER}
+      BASIC_AUTH_PASSWORD: ${MANGA3_PASSWORD}
+    ports:
+      - "4569:4567"
+
+networks:
+  rem-network:
+    external: true
