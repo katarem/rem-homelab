@@ -52,6 +52,7 @@ services:
     container_name: automatic1111
     ports:
       - "7860:7860"
+    env_file: ./ai/.env
     volumes:
       - ${SD_MODELS_PATH:-./models/Stable-diffusion}:/workspace/stable-diffusion-webui/models/Stable-diffusion
       - ${SD_LORA_MODELS_PATH:-./models/Lora}:/workspace/stable-diffusion-webui/models/Lora
@@ -61,15 +62,11 @@ services:
       - ${SD_EXTENSIONS_PATH:-./extensions}:/workspace/stable-diffusion-webui/extensions
     environment:
       - CLI_ARGS=--xformers --api --listen
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=video,compute,utility
     networks:
       rem-network:
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    runtime: nvidia
     restart: unless-stopped
 
 networks:
