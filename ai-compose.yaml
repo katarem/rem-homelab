@@ -47,7 +47,6 @@ services:
     networks:
       rem-network:
     restart: unless-stopped
-  automatic1111:
     image: ghcr.io/ai-dock/stable-diffusion-webui:latest-cuda
     container_name: automatic1111
     ports:
