@@ -62,7 +62,7 @@ services:
     environment:
       - CLI_ARGS=--xformers --api --listen
     networks:
-      rem-netork:
+      rem-network:
     deploy:
       resources:
         reservations:
