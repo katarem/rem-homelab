@@ -52,6 +52,7 @@ services:
     container_name: automatic1111
     ports:
       - "7860:7860"
+      - "1111:1111"
     env_file: ./ai/.env
     volumes:
       - ${SD_MODELS_PATH:-./models/Stable-diffusion}:/workspace/stable-diffusion-webui/models/Stable-diffusion
