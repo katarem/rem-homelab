@@ -47,6 +47,30 @@ services:
     networks:
       rem-network:
     restart: unless-stopped
+  automatic1111:
+    image: ghcr.io/ai-dock/stable-diffusion-webui:latest-cuda
+    container_name: automatic1111
+    ports:
+      - "7860:7860"
+    volumes:
+      - ${SD_MODELS_PATH:-./models/Stable-diffusion}:/workspace/stable-diffusion-webui/models/Stable-diffusion
+      - ${SD_LORA_MODELS_PATH:-./models/Lora}:/workspace/stable-diffusion-webui/models/Lora
+      - ${SD_VAE_MODELS_PATH:-./models/VAE}:/workspace/stable-diffusion-webui/models/VAE
+      - ${SD_CONTROLNET_MODELS_PATH:-./models/ControlNet}:/workspace/stable-diffusion-webui/models/ControlNet
+      - ${SD_OUTPUT_PATH:-./outputs}:/workspace/stable-diffusion-webui/outputs
+      - ${SD_EXTENSIONS_PATH:-./extensions}:/workspace/stable-diffusion-webui/extensions
+    environment:
+      - CLI_ARGS=--xformers --api --listen
+    networks:
+      rem-netork:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
 
 networks:
   rem-network:
