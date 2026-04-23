@@ -64,6 +64,7 @@ services:
       - CLI_ARGS=--xformers --api --listen
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=video,compute,utility
+      - WEBUI_URL=${SD_URL:-http://localhost:1111}
     networks:
       rem-network:
     runtime: nvidia
