@@ -156,7 +156,7 @@ services:
       rem-network:
 
   jackett:
-    image: lscr.io/linuxserver/jackett:latest
+    image: lscr.io/linuxserver/jackett:0.24.1616
     container_name: jackett
     env_file: ./media/.env
     environment:

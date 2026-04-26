@@ -1,0 +1,57 @@
+name: 'rem-dashboard'
+services:
+
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: unless-stopped
+    volumes:
+      - ./dashboard/data/homarr/appdata:/appdata
+      - //var/run/docker.sock:/var/run/docker.sock
+    env_file: ./dashboard/.env
+    environment:
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_ENCRYPTION_KEY}
+    ports:
+      - "7575:7575"
+    networks:
+      rem-network:
+  homarr-iframes:
+    container_name: homarr-iframes
+    image: ghcr.io/diogovalentte/homarr-iframes:latest
+    user: 1000:1000
+    environment:
+      - TZ=${TZ:-UTC}
+      - PORT=8080
+
+      - VIKUNJA_ADDRESS=${VIKUNJA_ADDRESS:-}
+      - INTERNAL_VIKUNJA_ADDRESS=${INTERNAL_VIKUNJA_ADDRESS:-http://vikunja:3456}
+      - VIKUNJA_TOKEN=${VIKUNJA_TOKEN:-}
+      - VIKUNJA_BACKGROUND_IMG_URL=${VIKUNJA_BACKGROUND_IMG_URL:-}
+   
+      - UPTIMEKUMA_ADDRESS=${UPTIMEKUMA_ADDRESS:-}
+      - INTERNAL_UPTIMEKUMA_ADDRESS=${INTERNAL_UPTIMEKUMA_ADDRESS:-http://kuma:3001}
+
+      - SPEEDTEST_TRACKER_ADDRESS=${SPEEDTEST_TRACKER_ADDRESS:-}
+      - INTERNAL_SPEEDTEST_TRACKER_ADDRESS=${INTERNAL_SPEEDTEST_TRACKER_ADDRESS:-}
+      - SPEEDTEST_TRACKER_TOKEN=${SPEEDTEST_TRACKER_TOKEN:-}
+
+      - KAVITA_ADDRESS=${KAVITA_ADDRESS:-}
+      - INTERNAL_KAVITA_ADDRESS=${INTERNAL_KAVITA_ADDRESS:-}
+      - KAVITA_USERNAME=${KAVITA_USERNAME:-}
+      - KAVITA_PASSWORD=${KAVITA_PASSWORD:-}
+
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    restart: on-failure
+    ports:
+      - 30080:8080
+    networks:
+      rem-network:
+
+networks:
+  rem-network:
+    name: rem-network
+    external: true

@@ -18,7 +18,7 @@ services:
     image: docker.io/library/postgres:16-alpine
     restart: unless-stopped
     volumes:
-      - ./auth/data/authentik-database:/var/lib/postgresql/data
+      - "${AUTHENTIK_DATABASE_PATH=./auth/data/authentik-database}:/var/lib/postgresql/data"
 
   authentik-redis:
     continer_name: authentik-redis
@@ -32,7 +32,7 @@ services:
       retries: 5
       timeout: 30s
     volumes:
-      - ./auth/data/authentik-redis:/data
+      - "${AUTHENTIK_REDIS_PATH:-./auth/data/authentik-redis}:/data"
 
   authentik-server:
     container_name: authentik-server
@@ -44,7 +44,7 @@ services:
     environment:
       AUTHENTIK_POSTGRESQL__HOST: authentik-db
       AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_DATABASE:-authentik}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DATABASE_PASSWORD}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DATABASE_PASSWORD:-authentik}
       AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_DATABASE_USER:-authentik}
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
     image: ghcr.io/goauthentik/server:2026.2.1
@@ -56,9 +56,9 @@ services:
     networks:
       rem-network:
     volumes:
-      - ./auth/data/authentik-server/media:/media
-      - ./auth/data/authentik-server/data:/data
-      - ./auth/data/authentik-server/custom-templates:/templates
+      - "${AUTHENTIK_MEDIA_PATH:-./auth/data/authentik-server/media}:/media"
+      - "${AUTHENTIK_DATA_PATH:-./auth/data/authentik-server/data}:/data"
+      - "${AUTHENTIK_CUSTOM_TEMPLATE_PATH:-./auth/data/authentik-server/custom-templates}:/templates"
 
   authentik-worker:
     container_name: authentik-worker
@@ -81,7 +81,7 @@ services:
     user: root
     volumes:
     - //var/run/docker.sock:/var/run/docker.sock
-    - ./auth/data/authentik-worker/data:/data
+    - ${AUTHENTIK_WORKER_DATA_PATH:-./auth/data/authentik-worker/data}:/data
     - ./auth/data/authentik-worker/certs:/certs
     - ./auth/data/authentik-worker/custom-templates:/templates
 
@@ -95,9 +95,11 @@ services:
         - 9300:9000
         - 9343:9443
     environment:
-        AUTHENTIK_HOST: https://auth.katarem.duckdns.org
+        AUTHENTIK_HOST: ${AUTHENTIK_HOST_URL:?Host url is required}
         AUTHENTIK_INSECURE: "true"
         AUTHENTIK_TOKEN: ${AUTHENTIK_LDAP_TOKEN}
+    profiles:
+      - ldap
 
 networks:
   rem-network:

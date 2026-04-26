@@ -1,0 +1,61 @@
+services:
+  
+  trilium:
+    image: triliumnext/trilium:latest
+    restart: unless-stopped
+    environment:
+      TRILIUM_DATA_DIR: /home/node/trilium-data
+    ports:
+      - 8280:8080
+    volumes:
+      - "${TRILIUM_DATA_DIR:-./documentation/data/trillium/data}:/home/node/trilium-data"
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      rem-network:
+
+  karakeep:
+    container_name: karakeep
+    image: ghcr.io/karakeep-app/karakeep:latest
+    restart: unless-stopped
+    volumes:
+      - ${KARAKEEP_DATA_PATH:-./documentation/data/karakeep/data}:/data
+    ports:
+      - 3320:3000
+    environment:
+      MEILI_ADDR: http://karakeep-meilisearch:7700
+      BROWSER_WEB_URL: http://karakeep-chrome:9222
+      OPENAI_BASE_URL: http://ollama-gpu:11434/v1
+      DATA_DIR: /data
+    networks:
+      rem-network:
+
+  karakeep-chrome:
+    container_name: karakeep-chrome
+    image: gcr.io/zenika-hub/alpine-chrome:124
+    restart: unless-stopped
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+    networks:
+      rem-network:
+
+  karakeep-meilisearch:
+    container_name: karakeep-meilisearch
+    image: getmeili/meilisearch:v1.41.0
+    restart: unless-stopped
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - "${MEILI_DATA_PATH:-./documentation/data/meili/data}:/meili_data"
+    networks:
+      rem-network:
+
+networks:
+  rem-network:
+    external: true
+    name: rem-network
