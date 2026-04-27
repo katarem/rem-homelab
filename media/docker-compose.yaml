@@ -4,7 +4,15 @@ services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin
     container_name: jellyfin
-    env_file: ./media/.env
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-retries: 2
+        loki-max-backoff: 800ms
+        loki-timeout: 1s
+        keep-file: "true"
+        mode: "non-blocking"
     environment:
       PUID: 1000
       PGID: 1000
@@ -12,7 +20,7 @@ services:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: video,compute,utility
     volumes:
-      - "${JELLYFIN_CONFIG_PATH:-./media/data/jellyfin/config}:/config"
+      - "${JELLYFIN_CONFIG_PATH:-./data/jellyfin/config}:/config"
       - "${MEDIA_SERIES_PATH}:/data/series"
       - "${MEDIA_MOVIES_PATH}:/data/movies"
       - "${MEDIA_ANIME_PATH}:/data/anime"
@@ -27,13 +35,12 @@ services:
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
-    env_file: ./media/.env
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Etc/UTC
     volumes:
-      - "${SONARR_CONFIG_PATH:-./media/data/sonarr/config}:/config"
+      - "${SONARR_CONFIG_PATH:-./data/sonarr/config}:/config"
       - "${MEDIA_SERIES_PATH}:/series"
       - "${MEDIA_ANIME_PATH}:/anime"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
@@ -46,13 +53,12 @@ services:
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
-    env_file: ./media/.env
     environment:
       PUID: 1000
       PGID: 1000
       TZ: Etc/UTC
     volumes:
-      - "${RADARR_CONFIG_PATH:-./media/data/radarr/config}:/config"
+      - "${RADARR_CONFIG_PATH:-./data/radarr/config}:/config"
       - "${MEDIA_MOVIES_PATH}:/movies"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
     ports:
@@ -72,7 +78,7 @@ services:
     ports:
       - 5055:5055
     volumes:
-      - "${SEERR_CONFIG_PATH:-./media/data/seerr/config}:/app/config"
+      - "${SEERR_CONFIG_PATH:-./data/seerr/config}:/app/config"
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -91,7 +97,7 @@ services:
       PGID: 1000
       TZ: Etc/UTC
     volumes:
-      - ${BAZARR_CONFIG_PATH:-./media/data/bazarr/config}:/config
+      - ${BAZARR_CONFIG_PATH:-./data/bazarr/config}:/config
       - ${MEDIA_MOVIES_PATH}:/movies 
       - ${MEDIA_SERIES_PATH}:/series
       - ${MEDIA_ANIME_PATH}:/anime
@@ -104,16 +110,15 @@ services:
   configarr:
     image: ghcr.io/raydak-labs/configarr:latest
     container_name: configarr
-    env_file: ./media/.env
     environment:
       USER_UID: 1000
       USER_GID: 1000
       TZ: Etc/UTC
     volumes:
-      - "${CONFIGARR_CONFIG_PATH:-./media/data/configarr/config}:/app/config" # Contains the config.yml and secrets.yml
-      - "${CONFIGARR_REPOS_PATH:-./media/data/configarr/dockerrepos}:/app/repos" # Cache repositories
-      - "${CONFIGARR_CUSTOM_CFS_PATH:-./media/data/configarr/custom/cfs}:/app/cfs" # Optional if custom formats locally provided
-      - "${CONFIGARR_CUSTOM_TEMPLATES:-./media/data/configarr/custom/templates}:/app/templates" # Optional if custom templates
+      - "${CONFIGARR_CONFIG_PATH:-./data/configarr/config}:/app/config" # Contains the config.yml and secrets.yml
+      - "${CONFIGARR_REPOS_PATH:-./data/configarr/dockerrepos}:/app/repos" # Cache repositories
+      - "${CONFIGARR_CUSTOM_CFS_PATH:-./data/configarr/custom/cfs}:/app/cfs" # Optional if custom formats locally provided
+      - "${CONFIGARR_CUSTOM_TEMPLATES:-./data/configarr/custom/templates}:/app/templates" # Optional if custom templates
     profiles:
       - config
     networks:
@@ -122,7 +127,6 @@ services:
   qbittorrent:
     container_name: qbittorrent
     image: lscr.io/linuxserver/qbittorrent:latest
-    env_file: ./media/.env
     environment:
       PUID: 1000
       PGID: 1000
@@ -130,7 +134,7 @@ services:
       WEBUI_PORT: 8080
       TORRENTING_PORT: 53565
     volumes:
-      - "${TORRENT_CONFIG_PATH:-./media/data/qbittorrent/config}:/config"
+      - "${TORRENT_CONFIG_PATH:-./data/qbittorrent/config}:/config"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
     ports:
       - 8080:8080
@@ -148,7 +152,7 @@ services:
       PGID: 1000
       TZ: Etc/UTC
     volumes:
-      - "${PROWLARR_CONFIG_PATH:-./media/data/prowlarr/config}:/config"
+      - "${PROWLARR_CONFIG_PATH:-./data/prowlarr/config}:/config"
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -158,7 +162,6 @@ services:
   jackett:
     image: lscr.io/linuxserver/jackett:0.24.1616
     container_name: jackett
-    env_file: ./media/.env
     environment:
       PUID: 1000
       PGID: 1000
@@ -166,7 +169,7 @@ services:
       AUTO_UPDATE: true
       RUN_OPTS: 
     volumes:
-      - "${JACKETT_CONFIG_PATH:-./media/data/jackett/config}:/config"
+      - "${JACKETT_CONFIG_PATH:-./data/jackett/config}:/config"
       - "${MEDIA_DOWNLOADS_PATH}:/downloads"
     ports:
       - 9117:9117
@@ -203,7 +206,7 @@ services:
     image: 'mccloud/subgen:latest'
     container_name: subgenai
     volumes:
-      - "${SUBGEN_MODEL_PATH:-./media/data/subgen/models}/models:/subgen/models"
+      - "${SUBGEN_MODEL_PATH:-./data/subgen/models}/models:/subgen/models"
       - "${SUBGEN_ENV_PATH:-./media/subgen.env}:/subgen/subgen.env:ro"
     environment:
       LOG_LEVEL: debug
@@ -239,7 +242,7 @@ services:
       - "${MEDIA_ANIME_PATH}:/anime"
       - "${MEDIA_SERIES_PATH}:/series"
       - "${MEDIA_MOVIES_PATH}:/movies"
-      - "${LINGARR_CONFIG_PATH:-./media/data/lingarr/config}:/app/config"
+      - "${LINGARR_CONFIG_PATH:-./data/lingarr/config}:/app/config"
     networks:
       rem-network:
     depends_on:
@@ -256,7 +259,7 @@ services:
       MYSQL_PASSWORD: ${LINGARR_DATABASE_PASSWORD:-lingarr}
       MYSQL_ROOT_PASSWORD: ${LINGARR_DATABASE_ROOT_PASSWORD:-lingarr} 
     volumes:
-      - ${LINGARR_DATABASE_PATH:-./media/data/lingarr-database/data}:/var/lib/mysql
+      - ${LINGARR_DATABASE_PATH:-./data/lingarr-database/data}:/var/lib/mysql
     networks:
       rem-network:
     healthcheck:
@@ -272,7 +275,7 @@ services:
     ports:
       - "11011:11011"
     volumes:
-      - "${CLEANUPARR_CONFIG_PATH:-./media/data/cleanuparr/config}:/config"
+      - "${CLEANUPARR_CONFIG_PATH:-./data/cleanuparr/config}:/config"
     environment:
       - PORT=11011
       - BASE_PATH=
