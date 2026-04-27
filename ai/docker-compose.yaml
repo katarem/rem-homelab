@@ -51,11 +51,6 @@ services:
       - "${OPENWEBUI_APP_PATH:-./ai/data/openwebui/open-webui}:/app/backend/data"
     ports:
       - 8180:8080
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
     depends_on:
       - ollama-gpu
     extra_hosts:
