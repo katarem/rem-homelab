@@ -5,7 +5,7 @@ services:
     container_name: ollama-gpu
     image: ollama/ollama:latest
     volumes:
-      - "${OLLAMA_DATA_PATH:-./ai/data/ollama}:/root/.ollama"
+      - "${OLLAMA_DATA_PATH:-./data/ollama}:/root/.ollama"
     ports:
       - 11434:11434
     runtime: nvidia
@@ -46,9 +46,9 @@ services:
         keep-file: "true"
         mode: "non-blocking"
     volumes:
-      - "${OPENWEBUI_DATA_PATH:-./ai/data/openwebui/data}:/data"
-      - "${OPENWEBUI_MODELS_PATH:-./ai/data/openwebui/models}:/models"
-      - "${OPENWEBUI_APP_PATH:-./ai/data/openwebui/open-webui}:/app/backend/data"
+      - "${OPENWEBUI_DATA_PATH:-./data/openwebui/data}:/data"
+      - "${OPENWEBUI_MODELS_PATH:-./data/openwebui/models}:/models"
+      - "${OPENWEBUI_APP_PATH:-./data/openwebui/open-webui}:/app/backend/data"
     ports:
       - 8180:8080
     depends_on:
