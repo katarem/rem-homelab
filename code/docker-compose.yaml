@@ -16,9 +16,9 @@ services:
     networks:
       rem-network:
     volumes:
-      - "${GITEA_DATA_PATH:-./code/data/gitea/data}:/data"
-      - "${GITEA_TZ_PATH:-./code/data/gitea/etc/timezone}:/etc/timezone:ro"
-      - "${GITEA_LT_PATH:-./code/data/gitea/etc/localtime}:/etc/localtime:ro"
+      - "${GITEA_DATA_PATH:-./data/gitea/data}:/data"
+      - "${GITEA_TZ_PATH:-./data/gitea/etc/timezone}:/etc/timezone:ro"
+      - "${GITEA_LT_PATH:-./data/gitea/etc/localtime}:/etc/localtime:ro"
     ports:
       - "3333:3000"
       - "222:22"
@@ -35,13 +35,13 @@ services:
     networks:
       rem-network:
     volumes:
-      - "${GITEA_DATABASE_PATH:-./code/data/gitea/database}:/var/lib/postgresql/data"
+      - "${GITEA_DATABASE_PATH:-./data/gitea/database}:/var/lib/postgresql/data"
 
   sonarqube:
     image: sonarqube:community
     container_name: sonarqube
     read_only: true
-    env_file: ./code/.env
+    env_file: ./.env
     environment:
       USER_UID: 1000
       USER_GID: 1000
@@ -49,10 +49,10 @@ services:
       SONAR_JDBC_USERNAME: ${SONARQUBE_DATABASE_USER:-sonar}
       SONAR_JDBC_PASSWORD: ${SONARQUBE_DATABASE_PASSWORD:-sonar}
     volumes:
-      - "${SONAR_DATA_PATH:-./code/data/sonarqube/data}:/opt/sonarqube/data"
-      - "${SONAR_EXTENSIONS_PATH:-./code/data/sonarqube/extensions}:/opt/sonarqube/extensions"
-      - "${SONAR_LOGS_PATH:-./code/data/sonarqube/logs}:/opt/sonarqube/logs"
-      - "${SONAR_TMP_PATH:-./code/data/sonarqube/temp}:/opt/sonarqube/temp"
+      - "${SONAR_DATA_PATH:-./data/sonarqube/data}:/opt/sonarqube/data"
+      - "${SONAR_EXTENSIONS_PATH:-./data/sonarqube/extensions}:/opt/sonarqube/extensions"
+      - "${SONAR_LOGS_PATH:-./data/sonarqube/logs}:/opt/sonarqube/logs"
+      - "${SONAR_TMP_PATH:-./data/sonarqube/temp}:/opt/sonarqube/temp"
     tmpfs:
       - /tmp:size=256M,mode=1777
     ports:
@@ -63,7 +63,7 @@ services:
   sonarqube-db:
     image: docker.io/library/postgres:17
     restart: always
-    env_file: ./code/.env
+    env_file: .env
     environment:
       USER_UID: 1000
       USER_GID: 1000
@@ -73,7 +73,7 @@ services:
     networks:
       rem-network:
     volumes:
-      - "${SONAR_DATABASE_PATH:-./code/data/sonarqube/database}:/var/lib/postgresql/data"
+      - "${SONAR_DATABASE_PATH:-./data/sonarqube/database}:/var/lib/postgresql/data"
 
 networks:
   rem-network:

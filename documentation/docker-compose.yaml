@@ -1,25 +1,11 @@
 services:
   
-  trilium:
-    image: triliumnext/trilium:latest
-    restart: unless-stopped
-    environment:
-      TRILIUM_DATA_DIR: /home/node/trilium-data
-    ports:
-      - 8280:8080
-    volumes:
-      - "${TRILIUM_DATA_DIR:-./documentation/data/trillium/data}:/home/node/trilium-data"
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    networks:
-      rem-network:
-
   karakeep:
     container_name: karakeep
     image: ghcr.io/karakeep-app/karakeep:latest
     restart: unless-stopped
     volumes:
-      - ${KARAKEEP_DATA_PATH:-./documentation/data/karakeep/data}:/data
+      - ${KARAKEEP_DATA_PATH:-./data/karakeep/data}:/data
     ports:
       - 3320:3000
     environment:
@@ -51,7 +37,7 @@ services:
     environment:
       MEILI_NO_ANALYTICS: "true"
     volumes:
-      - "${MEILI_DATA_PATH:-./documentation/data/meili/data}:/meili_data"
+      - "${MEILI_DATA_PATH:-./data/meili/data}:/meili_data"
     networks:
       rem-network:
 

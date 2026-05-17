@@ -3,7 +3,7 @@ services:
   vikunja:
     container_name: vikunja
     image: vikunja/vikunja
-    env_file: ./task/.env
+    env_file: .env
     environment:
       VIKUNJA_SERVICE_PUBLICURL: ${VIKUNJA_PUBLIC_URL}
       VIKUNJA_DATABASE_HOST: vikunja-db
@@ -17,7 +17,7 @@ services:
     ports:
       - 3456:3456
     volumes:
-      - ${VIKUNJA_DATA_PATH:-./task/data/vikunja/data}:/app/vikunja/files
+      - ${VIKUNJA_DATA_PATH:-./data/vikunja/data}:/app/vikunja/files
     depends_on:
       vikunja-db:
         condition: service_healthy
@@ -28,13 +28,13 @@ services:
   vikunja-db:
     container_name: vikunja-db
     image: paradedb/paradedb:latest
-    env_file: ./task/.env
+    env_file: .env
     environment:
       POSTGRES_PASSWORD: ${VIKUNJA_DATABASE_PASSWORD:-vikunja}
       POSTGRES_USER: ${VIKUNJA_DATABASE_USER:-vikunja}
       POSTGRES_DATABASE: ${VIKUNJA_DATABASE:-vikunja}
     volumes:
-      - "${VIKUNJA_DATABASE_DATA_PATH:-./task/data/vikunja-db/data}:/var/lib/postgresql"
+      - "${VIKUNJA_DATABASE_DATA_PATH:-./data/vikunja-db/data}:/var/lib/postgresql"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER"]
