@@ -88,6 +88,12 @@ sonarr:
         assign_scores_to:
           - name: Remux-1080p - Anime
             score: 50
+      - trash_ids:
+        - custom-spanish-audio
+        assign_scores_to:
+          - name: Remux-1080p - Anime - ONLY ES
+            score: 10000
+
   main:
     base_url: http://sonarr:8989
     api_key: !secret SONARR_API_KEY
@@ -100,26 +106,35 @@ sonarr:
       - template: sonarr-v4-custom-formats-web-2160p
     custom_formats:
       - trash_ids:
-          - custom-spanish-audio
+        - custom-spanish-audio
         assign_scores_to:
           - name: WEB-1080p - ES
             score: 200
       - trash_ids:
-          - custom-dual-audio
+        - custom-dual-audio
         assign_scores_to:
           - name: WEB-1080p - ES
             score: 80
       - trash_ids:
-          - custom-spanish-audio
+        - custom-spanish-audio
         assign_scores_to:
           - name: WEB-2160p - ES
             score: 200
       - trash_ids:
-          - custom-dual-audio
+        - custom-dual-audio
         assign_scores_to:
           - name: WEB-2160p - ES
             score: 80
-
+      - trash_ids:
+        - custom-spanish-audio
+        assign_scores_to:
+          - name: WEB-1080p - ONLY ES
+            score: 10000
+      - trash_ids:
+        - custom-spanish-audio
+        assign_scores_to:
+          - name: WEB-2160p - ONLY ES
+            score: 10000
 radarr:
   anime:
     base_url: http://radarr:7878
@@ -141,6 +156,11 @@ radarr:
         assign_scores_to:
           - name: Remux-1080p - Anime
             score: 50
+      - trash_ids:
+          - custom-spanish-audio
+        assign_scores_to:
+          - name: Remux-1080p - Anime - ONLY ES
+            score: 10000
   main:
     base_url: http://radarr:7878
     api_key: !secret RADARR_API_KEY
@@ -197,3 +217,23 @@ radarr:
           assign_scores_to:
             - name: UHD Bluray + WEB - ES
               score: 80
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: HD Bluray + WEB - ONLY ES
+              score: 10000
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: Remux + WEB 1080p - ONLY ES
+              score: 10000
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: Remux + WEB 2160p - ONLY ES
+              score: 10000
+        - trash_ids:
+            - custom-spanish-audio
+          assign_scores_to:
+            - name: UHD Bluray + WEB - ONLY ES
+              score: 10000
