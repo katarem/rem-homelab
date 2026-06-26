@@ -37,8 +37,8 @@ authentication_backend:
     additional_groups_dn: 'ou=groups'
     groups_filter: '(member={dn})'
     group_name_attribute: 'cn'
-    user: '{{ env "LLDAP_ADMIN_USER" }}'
-    password: '{{ env "LLDAP_ADMIN_PASSWORD" }}'
+    user: '{{ env "LDAP_ADMIN_USER" }}'
+    password: '{{ env "LDAP_ADMIN_PASSWORD" }}'
 
 access_control:
   default_policy: 'one_factor'
