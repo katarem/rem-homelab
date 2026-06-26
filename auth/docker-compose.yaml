@@ -7,7 +7,7 @@ services:
     networks:
       rem-network:
     volumes:
-      - '${PWD}/data/authelia/config:/config'
+      - './config/authelia:/config'
     environment:
       TZ: 'Etc/UTC'
 
