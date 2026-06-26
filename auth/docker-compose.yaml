@@ -1,4 +1,5 @@
 name: rem-auth
+
 services:
   authelia:
     container_name: 'authelia'
@@ -6,10 +7,36 @@ services:
     restart: 'unless-stopped'
     networks:
       rem-network:
+    ports:
+      - "9091:9091"
+    env_file: ./.env
     volumes:
       - './config/authelia:/config'
     environment:
       TZ: 'Etc/UTC'
+      AUTHELIA_CONFIGURATION_FILTERS: 'expand-env'
+
+  lldap:
+    container_name: 'lldap'
+    image: lldap/lldap:stable
+    restart: 'unless-stopped'
+    networks:
+      rem-network:
+    env_file: ./.env
+    ports:
+      - "3890:3890"
+      - "17170:17170"
+    volumes:
+      - "./data/lldap:/data"
+    environment:
+      UID: 1000
+      GID: 1000
+      TZ: 'Etc/UTC'
+      LLDAP_JWT_SECRET: ${LLDAP_JWT_SECRET:?Jwt secret is necessary for LLDAP}
+      LLDAP_KEY_SEED: ${LLDAP_KEY_SEED:?Key seed is necessary for LLDAP}
+      LLDAP_LDAP_BASE_DN: ${LLDAP_BASE_DN:-dc=mydomain,dc=com}
+      LLDAP_LDAP_USER_PASS: ${LLDAP_USER_PASSWORD:?Password has to be established}
+      LLDAP_LDAP_ADMIN_PASS: ${LLDAP_USER_PASSWORD:?Password has to be established}
 
 networks:
   rem-network:
