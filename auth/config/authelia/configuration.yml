@@ -48,7 +48,7 @@ session:
   cookies:
     - domain: '{{ env "SESSION_DOMAIN" }}'
       authelia_url: 'https://auth.{{ env "SESSION_DOMAIN" }}'
-      default_redirection_url: 'https://google.com'
+      default_redirection_url: '{{ env "SESSION_DOMAIN" }}'
       expiration: '3M'
       inactivity: '1M'
       remember_me: '1y'
