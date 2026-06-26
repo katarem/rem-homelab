@@ -4,7 +4,7 @@ services:
     container_name: copyparty
     image: copyparty/ac
     volumes:
-      - "${COPYPARTY_SHARE_PATH:./data/copyparty}:/w"
+      - "${COPYPARTY_SHARE_PATH:-./data/copyparty}:/w"
       - "./config/copyparty:/cfg"
 networks:
   rem-network:
