@@ -14,7 +14,7 @@ services:
       - './config/authelia:/config'
     environment:
       TZ: 'Etc/UTC'
-      X_AUTHELIA_CONFIG_FILTERS: 'expand-env'
+      X_AUTHELIA_CONFIG_FILTERS: 'template'
 
   lldap:
     container_name: 'lldap'

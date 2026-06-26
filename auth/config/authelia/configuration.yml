@@ -1,6 +1,6 @@
 theme: 'auto'
 
-jwt_secret: ${LLDAP_JWT_SECRET}
+jwt_secret: '{{ env "LLDAP_JWT_SECRET" }}'
 
 server:
   host: 0.0.0.0
@@ -16,13 +16,13 @@ log:
   level: debug
 
 totp:
-  issuer: 'auth.${SESSION_DOMAIN}'
+  issuer: 'auth.{{ env "SESSION_DOMAIN" }}'
   period: 30
   skew: 1
 
 identity_validation:
   reset_password:
-    jwt_secret: '${RESET_PASSWORD_JWT_SECRET}'
+    jwt_secret: '{{ env "RESET_PASSWORD_JWT_SECRET" }}'
 
 authentication_backend:
   ldap:
@@ -37,8 +37,8 @@ authentication_backend:
     additional_groups_dn: 'ou=groups'
     groups_filter: '(member={dn})'
     group_name_attribute: 'cn'
-    user: '${LDAP_ADMIN_USER}'
-    password: '${LDAP_ADMIN_PASSWORD}'
+    user: '{{ env "LDAP_ADMIN_USER" }}'
+    password: '{{ env "LDAP_ADMIN_PASSWORD" }}'
 
 access_control:
   default_policy: 'one_factor'
@@ -46,8 +46,8 @@ access_control:
 session:
   name: 'authelia_session'
   cookies:
-    - domain: '${SESSION_DOMAIN}'
-      authelia_url: 'https://auth.${SESSION_DOMAIN}'
+    - domain: '{{ env "SESSION_DOMAIN" }}'
+      authelia_url: 'https://auth.{{ env "SESSION_DOMAIN" }}'
       default_redirection_url: 'https://google.com'
       expiration: '3M'
       inactivity: '1M'
@@ -59,7 +59,7 @@ regulation:
   ban_time: '15 minutes'
 
 storage:
-  encryption_key: '${STORAGE_ENCRYPTION_KEY}'
+  encryption_key: '{{ env "STORAGE_ENCRYPTION_KEY" }}'
   local:
     path: '/config/db.sqlite3'
 
