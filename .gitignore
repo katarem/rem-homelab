@@ -1,3 +1,4 @@
 **/data/**
 **.env
 !media/data/configarr/config/config.yml
+**/config/**
