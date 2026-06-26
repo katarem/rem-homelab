@@ -6,6 +6,10 @@ services:
     volumes:
       - "${COPYPARTY_SHARE_PATH:-./data/copyparty}:/w"
       - "./config/copyparty:/cfg"
+    ports:
+      - 3923:3923
+    networks:
+      rem-network:
 networks:
   rem-network:
     external: true
