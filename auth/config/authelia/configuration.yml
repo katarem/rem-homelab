@@ -99,3 +99,4 @@ identity_providers:
         authorization_policy: one_factor
         redirect_uris:
           - https://media.katarem.duckdns.org/sso/OID/redirect/authelia
+        consent_mode: implicit
