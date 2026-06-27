@@ -15,6 +15,7 @@ services:
     environment:
       TZ: 'Etc/UTC'
       X_AUTHELIA_CONFIG_FILTERS: 'template'
+      AUTHELIA_IDENTITY_PROVIDERS_OIDC_JWKS_0_KEY_FILE: '/config/secrets/oidc_private_key.pem'
 
   lldap:
     container_name: 'lldap'
