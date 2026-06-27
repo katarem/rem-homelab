@@ -66,3 +66,25 @@ storage:
 notifier:
   filesystem:
     filename: '/config/notification.txt'
+
+identity_providers:
+  oidc:
+    hmac_secret: '{{ env "OIDC_HMAC_SECRET" }}'
+    jwks:
+      - key: |
+        {{ secret "/config/secrets/oidc_private_key.pem" }}
+
+    clients:
+      - client_id: 'portainer'
+        client_name: 'Portainer'
+        client_secret: '{{ env "PORTAINER_CLIENT_SECRET_HASH" }}'
+        public: false
+        authorization_policy: 'one_factor'
+        redirect_uris:
+          - 'https://portainer.katarem.duckdns.org'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+          - 'groups'
+        userinfo_signed_response_alg: 'none'
