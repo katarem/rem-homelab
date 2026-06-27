@@ -71,7 +71,10 @@ identity_providers:
   oidc:
     hmac_secret: '{{ env "OIDC_HMAC_SECRET" }}'
     jwks:
-      - key: {{ secret "/config/secrets/oidc_private_key.pem" | mindent 10 "|" | msquote }}
+      - key: |
+          -----BEGIN PRIVATE KEY-----
+          TEST
+          -----END PRIVATE KEY-----
     clients:
       - client_id: 'portainer'
         client_name: 'Portainer'
