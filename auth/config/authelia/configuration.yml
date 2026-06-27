@@ -87,3 +87,21 @@ identity_providers:
           - 'email'
           - 'groups'
         userinfo_signed_response_alg: 'none'
+      - client_id: 'jellyfin'
+        client_name: 'Jellyfin'
+        client_secret: '{{ env "JELLYFIN_CLIENT_SECRET_HASH" }}'
+        public: false
+        authorization_policy: 'one_factor'
+        redirect_uris:
+          - 'https://media.katarem.duckdns.org'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'groups'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+        access_token_signed_response_alg: 'none'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_post'
