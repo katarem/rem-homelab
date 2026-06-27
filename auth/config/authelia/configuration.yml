@@ -71,7 +71,8 @@ identity_providers:
   oidc:
     hmac_secret: '{{ env "OIDC_HMAC_SECRET" }}'
     jwks:
-      - key: |
+      - key_id: 'principal'
+        key: |
           {{ fileContent "/config/secrets/oidc_private_key.pem" | nindent 8 }}
     clients:
       - client_id: 'portainer'
