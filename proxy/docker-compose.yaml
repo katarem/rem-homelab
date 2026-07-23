@@ -54,10 +54,13 @@ services:
     restart: unless-stopped
     networks:
       wg:
+        interface_name: eth0
+        gw_priority: 1
         ipv4_address: 10.42.42.42
         ipv6_address: fdcc:ad94:bacf:61a3::2a
       rem-network:
-
+        interface_name: eth1
+        gw_priority: 0
 networks:
   wg:
     driver: bridge
