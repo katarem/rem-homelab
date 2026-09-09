@@ -320,10 +320,10 @@ services:
       container_name: romm-db
       restart: unless-stopped
       environment:
-          - "MARIADB_ROOT_PASSWORD=${ROMM_PASSWD:123456}" # Use a unique, secure password
-          - "MARIADB_DATABASE=${ROMM_DATABASE:romm-db}"
-          - "MARIADB_USER=${ROMM_USER:romm-user}"
-          - "MARIADB_PASSWORD=${ROMM_PASSWD:123456}"
+          - "MARIADB_ROOT_PASSWORD=${ROMM_PASSWD:-123456}" # Use a unique, secure password
+          - "MARIADB_DATABASE=${ROMM_DATABASE:-romm-db}"
+          - "MARIADB_USER=${ROMM_USER:-romm-user}"
+          - "MARIADB_PASSWORD=${ROMM_PASSWD:-123456}"
       volumes:
           - ./data/romm-stack/romm-db:/var/lib/mysql
       ports:
