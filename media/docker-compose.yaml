@@ -292,11 +292,11 @@ services:
       container_name: romm
       restart: unless-stopped
       environment:
-          - DB_HOST=${ROMM_DATABASE:romm-db}
-          - DB_NAME=${ROMM_NAME:romm} # Should match MARIADB_DATABASE in mariadb
-          - DB_USER=${ROMM_USER:romm-user} # Should match MARIADB_USER in mariadb
-          - DB_PASSWD=${ROMM_PASSWD:123456} # Should match MARIADB_PASSWORD in mariadb
-          - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_KEY:-Obligatorio} # Generate a key with `openssl rand -hex 32`
+          - DB_HOST=${ROMM_DATABASE:-romm-db}
+          - DB_NAME=${ROMM_NAME:-romm} # Should match MARIADB_DATABASE in mariadb
+          - DB_USER=${ROMM_USER:-romm-user} # Should match MARIADB_USER in mariadb
+          - DB_PASSWD=${ROMM_PASSWD:-123456} # Should match MARIADB_PASSWORD in mariadb
+          - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_KEY:?Obligatorio} # Generate a key with `openssl rand -hex 32`
           - SCREENSCRAPER_USER= # These are the recommended metadata providers
           - SCREENSCRAPER_PASSWORD= # https://docs.romm.app/latest/getting-started/metadata-providers/#screenscraper
           - RETROACHIEVEMENTS_API_KEY= # https://docs.romm.app/latest/getting-started/metadata-providers/#retroachievements
@@ -306,9 +306,9 @@ services:
       volumes:
           - ./data/romm-stack/romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
           - ./data/romm-stack/romm-redis:/redis-data # Cached data for background tasks
-          - "${ROMM_LIBRARY:./roms/library}:/romm/library" # Your game library. Check https://github.com/rommapp/romm?tab=readme-ov-file#folder-structure for more details.
-          - "${ROMM_ASSETS:./roms/assets}:/romm/assets" # Uploaded saves, states, etc.
-          - "${ROMM_CONFIG:./roms/config}:/romm/config" # Path where config.yml is stored
+          - "${ROMM_LIBRARY:-./roms/library}:/romm/library" # Your game library. Check https://github.com/rommapp/romm?tab=readme-ov-file#folder-structure for more details.
+          - "${ROMM_ASSETS:-./roms/assets}:/romm/assets" # Uploaded saves, states, etc.
+          - "${ROMM_CONFIG:-./roms/config}:./romm/config" # Path where config.yml is stored
       ports:
           - 80:8080
       depends_on:
