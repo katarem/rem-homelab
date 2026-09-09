@@ -310,7 +310,7 @@ services:
           - "${ROMM_ASSETS:-./roms/assets}:/romm/assets" # Uploaded saves, states, etc.
           - "${ROMM_CONFIG:-./roms/config}:/romm/config" # Path where config.yml is stored
       ports:
-          - 80:8080
+          - "8867:8080"
       depends_on:
           romm-db:
               condition: service_healthy
