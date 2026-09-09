@@ -287,6 +287,55 @@ services:
     networks:
       rem-network:
 
+  romm:
+      image: rommapp/romm:latest
+      container_name: romm
+      restart: unless-stopped
+      environment:
+          - DB_HOST=${ROMM_DATABASE:romm-db}
+          - DB_NAME=${ROMM_NAME:romm} # Should match MARIADB_DATABASE in mariadb
+          - DB_USER=${ROMM_USER:romm-user} # Should match MARIADB_USER in mariadb
+          - DB_PASSWD=${ROMM_PASSWD:123456} # Should match MARIADB_PASSWORD in mariadb
+          - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_KEY:-Obligatorio} # Generate a key with `openssl rand -hex 32`
+          - SCREENSCRAPER_USER= # These are the recommended metadata providers
+          - SCREENSCRAPER_PASSWORD= # https://docs.romm.app/latest/getting-started/metadata-providers/#screenscraper
+          - RETROACHIEVEMENTS_API_KEY= # https://docs.romm.app/latest/getting-started/metadata-providers/#retroachievements
+          - STEAMGRIDDB_API_KEY= # https://docs.romm.app/latest/getting-started/metadata-providers/#steamgriddb
+          - HASHEOUS_API_ENABLED=true # https://docs.romm.app/latest/getting-started/metadata-providers/#hasheous
+          - HLTB_API_ENABLED=true
+      volumes:
+          - ./data/romm-stack/romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
+          - ./data/romm-stack/romm-redis:/redis-data # Cached data for background tasks
+          - "${ROMM_LIBRARY:./roms/library}:/romm/library" # Your game library. Check https://github.com/rommapp/romm?tab=readme-ov-file#folder-structure for more details.
+          - "${ROMM_ASSETS:./roms/assets}:/romm/assets" # Uploaded saves, states, etc.
+          - "${ROMM_CONFIG:./roms/config}:/romm/config" # Path where config.yml is stored
+      ports:
+          - 80:8080
+      depends_on:
+          romm-db:
+              condition: service_healthy
+              restart: true
+  romm-db:
+      image: mariadb:latest
+      container_name: romm-db
+      restart: unless-stopped
+      environment:
+          - "MARIADB_ROOT_PASSWORD=${ROMM_PASSWD:123456}" # Use a unique, secure password
+          - "MARIADB_DATABASE=${ROMM_DATABASE:romm-db}"
+          - "MARIADB_USER=${ROMM_USER:romm-user}"
+          - "MARIADB_PASSWORD=${ROMM_PASSWD:123456}"
+      volumes:
+          - ./data/romm-stack/romm-db:/var/lib/mysql
+      ports:
+          - "7336:3306"
+      healthcheck:
+          test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+          start_period: 30s
+          start_interval: 10s
+          interval: 10s
+          timeout: 5s
+          retries: 5
+
 networks:
   rem-network:
     external: true
