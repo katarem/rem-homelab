@@ -303,6 +303,9 @@ services:
           - STEAMGRIDDB_API_KEY= # https://docs.romm.app/latest/getting-started/metadata-providers/#steamgriddb
           - HASHEOUS_API_ENABLED=true # https://docs.romm.app/latest/getting-started/metadata-providers/#hasheous
           - HLTB_API_ENABLED=true
+          - LAUNCHBOX_API_ENABLED=true
+          - ENABLE_SCHEDULED_UPDATE_LAUNCHBOX_METADATA=true
+          - PLAYMATCH_API_ENABLED=true
       volumes:
           - ./data/romm-stack/romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
           - ./data/romm-stack/romm-redis:/redis-data # Cached data for background tasks
