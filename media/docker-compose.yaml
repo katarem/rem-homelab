@@ -306,6 +306,8 @@ services:
           - LAUNCHBOX_API_ENABLED=true
           - ENABLE_SCHEDULED_UPDATE_LAUNCHBOX_METADATA=true
           - PLAYMATCH_API_ENABLED=true
+          - IGDB_CLIENT_ID=${IGDB_CLIENT_ID:?Required}
+          - IGDB_CLIENT_SECRET=${IGDB_CLIENT_SECRET:?Required}
       volumes:
           - ./data/romm-stack/romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
           - ./data/romm-stack/romm-redis:/redis-data # Cached data for background tasks
