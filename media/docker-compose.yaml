@@ -292,7 +292,7 @@ services:
       container_name: romm
       restart: unless-stopped
       environment:
-          - DB_HOST=${ROMM_DATABASE:-romm-db}
+          - DB_HOST=${ROMM_DATABASE:-romm}
           - DB_NAME=${ROMM_NAME:-romm} # Should match MARIADB_DATABASE in mariadb
           - DB_USER=${ROMM_USER:-romm-user} # Should match MARIADB_USER in mariadb
           - DB_PASSWD=${ROMM_PASSWD:-123456} # Should match MARIADB_PASSWORD in mariadb
