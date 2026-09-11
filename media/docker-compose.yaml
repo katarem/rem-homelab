@@ -308,6 +308,8 @@ services:
           - PLAYMATCH_API_ENABLED=true
           - IGDB_CLIENT_ID=${IGDB_CLIENT_ID:?Required}
           - IGDB_CLIENT_SECRET=${IGDB_CLIENT_SECRET:?Required}
+          - SCAN_WORKERS=4
+          - WEB_SERVER_CONCURRENCY=8
       volumes:
           - ./data/romm-stack/romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
           - ./data/romm-stack/romm-redis:/redis-data # Cached data for background tasks
