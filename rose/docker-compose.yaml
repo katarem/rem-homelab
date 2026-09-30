@@ -23,7 +23,7 @@ services:
     environment:
       POSTGRES_PASSWORD: ${FLIGHT_WATCHER_DB_PASSWORD:-password123}
       POSTGRES_USER: ${FLIGHT_WATCHER_DB_USER:-fw_user}
-      POSTGRES_DATABASE_NAME: flight_watcher
+      POSTGRES_DB: flight_watcher
     networks:
       rem-network:
 
