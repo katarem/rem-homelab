@@ -27,6 +27,13 @@ services:
     networks:
       rem-network:
 
+  bot-ddlg:
+    container_name: bot-ddlg
+    env_file:
+      - .env
+    image: katarem/bot-ddlg:1.0.0
+    restart: unless-stopped
+
 networks:
   rem-network:
       external: true
