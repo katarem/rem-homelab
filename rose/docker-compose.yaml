@@ -1,0 +1,34 @@
+name: 'rem-rose'
+services:
+  flight-watcher:
+    container_name: flight-watcher
+    image: katarem/flight-watcher:latest
+    restart: until-restart
+    environment:
+      DB_ENGINE: postgres
+      DB_HOST: fw-db
+      DB_PORT: 67801
+      DB_NAME: flight_watcher
+      DB_USER: ${FLIGHT_WATCHER_DB_USER:-fw_user}
+      DB_PASSWORD: ${FLIGHT_WATCHER_DB_PASSWORD:-password123}
+    ports: 
+      - 67800:8000
+    networks:
+      rem-network:
+    
+  flight-watcher-db:
+    container_name: fw-db
+    image: postgres:latest
+    restart: until-restart
+    environment:
+      POSTGRES_PASSWORD: ${FLIGHT_WATCHER_DB_PASSWORD:-password123}
+      POSTGRES_USER: ${FLIGHT_WATCHER_DB_USER:-fw_user}
+      POSTGRES_DATABASE_NAME: flight_watcher
+    ports:
+      - 67801:5432
+    networks:
+      rem-network:
+
+networks:
+  rem-network:
+      external: true
