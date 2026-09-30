@@ -3,7 +3,7 @@ services:
   flight-watcher:
     container_name: flight-watcher
     image: katarem/flight-watcher:1.0.0
-    restart: until-restart
+    restart: unless-stopped
     environment:
       DB_ENGINE: postgres
       DB_HOST: fw-db
@@ -19,7 +19,7 @@ services:
   flight-watcher-db:
     container_name: fw-db
     image: postgres:latest
-    restart: until-restart
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: ${FLIGHT_WATCHER_DB_PASSWORD:-password123}
       POSTGRES_USER: ${FLIGHT_WATCHER_DB_USER:-fw_user}
