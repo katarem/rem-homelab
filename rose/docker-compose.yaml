@@ -34,6 +34,15 @@ services:
     image: katarem/bot-ddlg:1.0.0
     restart: unless-stopped
 
+  happy-1-month:
+    container_name: rosa_gift
+    image: katarem/happy-1-month-rosa:1.0.0
+    restart: unless-stopped
+    ports:
+      - 10672:80
+    networks:
+      rem-network:
+
 networks:
   rem-network:
       external: true
