@@ -7,12 +7,12 @@ services:
     environment:
       DB_ENGINE: postgres
       DB_HOST: fw-db
-      DB_PORT: 67801
+      DB_PORT: 10671
       DB_NAME: flight_watcher
       DB_USER: ${FLIGHT_WATCHER_DB_USER:-fw_user}
       DB_PASSWORD: ${FLIGHT_WATCHER_DB_PASSWORD:-password123}
     ports: 
-      - 67800:8000
+      - 10670:8000
     networks:
       rem-network:
     
@@ -25,7 +25,7 @@ services:
       POSTGRES_USER: ${FLIGHT_WATCHER_DB_USER:-fw_user}
       POSTGRES_DATABASE_NAME: flight_watcher
     ports:
-      - 67801:5432
+      - 10671:5432
     networks:
       rem-network:
 
