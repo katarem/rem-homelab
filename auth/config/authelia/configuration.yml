@@ -69,7 +69,7 @@ notifier:
 
 identity_providers:
   oidc:
-    claim_policies:
+    claims_policies:
       pingvin:
         id_token:
           - 'email'
