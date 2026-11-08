@@ -102,7 +102,7 @@ identity_providers:
         consent_mode: implicit
       - client_id: 'pingvin_share'
         client_name: 'Pingvin Share'
-        client_secret: '{{ env "PINGVIN_CLIENT_SECRET_HASH"}}'
+        client_secret: '{{ env "PINGVIN_CLIENT_SECRET_HASH" }}'
         public: false
         authorization_policy: 'one_factor'
         redirect_uris:
