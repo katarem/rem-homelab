@@ -151,7 +151,7 @@ services:
       rem-network:
 
   jackett:
-    image: lscr.io/linuxserver/jackett:0.24.1616
+    image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
     environment:
       PUID: 1000
