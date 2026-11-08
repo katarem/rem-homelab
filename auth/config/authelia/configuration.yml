@@ -106,7 +106,7 @@ identity_providers:
         public: false
         authorization_policy: 'one_factor'
         redirect_uris:
-          - 'https://share.katarem.com/api/oauth/callback/oidc'
+          - 'https://send.katarem.com/api/oauth/callback/oidc'
         scopes:
           - 'openid'
           - 'profile'
