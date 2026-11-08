@@ -1,15 +1,17 @@
 name: rem-files
 services:
-  copyparty:
-    container_name: copyparty
-    image: copyparty/ac
-    volumes:
-      - "${COPYPARTY_SHARE_PATH:-./data/copyparty}:/w"
-      - "./config/copyparty:/cfg"
+  pingvin-share-x:
+    container_name: pingvin-share-x
+    image: ghcr.io/smp46/pingvin-share-x
+    restart: unless-stopped
     ports:
-      - 3923:3923
-    networks:
-      rem-network:
+      - 3123:3000
+    environment:
+      - TRUST_PROXY=true
+    volumes:
+      - "./data:/opt/app/backend/data:rw,z"
+      - "./data/images:/opt/app/frontend/public/img:rw,z"
+      - "./config/config.yaml:/opt/app/config.yaml"
 networks:
   rem-network:
     external: true
