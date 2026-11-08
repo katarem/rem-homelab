@@ -96,7 +96,21 @@ identity_providers:
           - 'profile'
           - 'groups'
         token_endpoint_auth_method: client_secret_post
-        authorization_policy: one_factor
+        authorization_policy: 'one_factor'
         redirect_uris:
           - https://media.katarem.duckdns.org/sso/OID/redirect/authelia
         consent_mode: implicit
+      - client_id: 'pingvin_share'
+        client_name: 'Pingvin Share'
+        client_secret: '{{ env "PINGVIN_CLIENT_SECRET_HASH"}}'
+        public: false
+        authorization_policy: 'one_factor'
+        redirect_uris:
+          - 'https://share.katarem.com/api/oauth/callback/oidc'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+          - 'groups'
+        userinfo_signed_response_alg: 'none'
+        token_endpoint_auth_method: 'client_secret_post'
