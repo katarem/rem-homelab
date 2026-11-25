@@ -13,7 +13,7 @@ x-suwayomi: &swayomi-base
     user: 1000:1000
     environment:
       <<: *swayomi-env
-    env_file: ./book/.env
+    env_file: .env
     restart: on-failure:3
     networks:
       rem-network:
