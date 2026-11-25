@@ -123,3 +123,16 @@ identity_providers:
         userinfo_signed_response_alg: 'none'
         token_endpoint_auth_method: 'client_secret_post'
         claims_policy: 'pingvin'
+      - client_id: 'sure_finance'
+        client_name: 'Sure Finance'
+        client_secret: '{{ env "SURE_FINANCE_CLIENT_SECRET_HASH" }}'
+        authorization_policy: 'one_factor'
+        public: false
+        consent_mode: implicit
+        redirect_uris:
+          - 'https://finances.katarem.com/auth/authelia/callback'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+          - 'groups'
